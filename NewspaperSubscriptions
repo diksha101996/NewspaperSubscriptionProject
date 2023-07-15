@@ -1,0 +1,81 @@
+package CodeTest;
+import java.util.ArrayList;
+import java.util.List;
+
+class Newspaper {
+    String name;
+    double[] prices;
+
+    public Newspaper(String name, double[] prices) {
+        this.name = name;
+        this.prices = prices;
+    }
+}
+
+public class NewspaperSubscriptions {
+    public static void main(String[] args) {
+        // Create newspaper objects with their respective prices
+        Newspaper toi = new Newspaper("TOI", new double[]{3, 3, 3, 3, 3, 5, 6});
+        Newspaper hindu = new Newspaper("Hindu", new double[]{2.5, 2.5, 2.5, 2.5, 2.5, 4, 4});
+        Newspaper et = new Newspaper("ET", new double[]{4, 4, 4, 4, 4, 4, 10});
+        Newspaper bm = new Newspaper("BM", new double[]{1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5});
+        Newspaper ht = new Newspaper("HT", new double[]{2, 2, 2, 2, 2, 4, 4});
+
+        // Create a list of all newspapers
+        List<Newspaper> newspapers = new ArrayList<>();
+        newspapers.add(toi);
+        newspapers.add(hindu);
+        newspapers.add(et);
+        newspapers.add(bm);
+        newspapers.add(ht);
+
+        double budget = 40; // Weekly budget
+
+        // Find all possible combinations of newspaper subscriptions
+        List<List<String>> subscriptions = findSubscriptions(newspapers, budget);
+
+        // Print the output
+        for (List<String> subscription : subscriptions) {
+            System.out.println(subscription);
+        }
+    }
+
+    private static List<List<String>> findSubscriptions(List<Newspaper> newspapers, double budget) {
+        List<List<String>> result = new ArrayList<>();
+        List<String> current = new ArrayList<>();
+
+        // Recursively find combinations of subscriptions
+        findCombinations(newspapers, budget, result, current, 0);
+
+        return result;
+    }
+
+    private static void findCombinations(List<Newspaper> newspapers, double budget, List<List<String>> result,
+                                         List<String> current, int index) {
+        // Base case: if budget is 0, add the current combination to the result
+        if (budget == 0) {
+            result.add(new ArrayList<>(current));
+            return;
+        }
+
+        // Base case: if budget is negative or all newspapers have been considered, return
+        if (budget < 0 || index == newspapers.size()) {
+            return;
+        }
+
+        Newspaper newspaper = newspapers.get(index);
+
+        // Try including the current newspaper in the combination
+        for (int i = 0; i < newspaper.prices.length; i++) {
+            double price = newspaper.prices[i];
+            if (budget >= price) {
+                current.add(newspaper.name);
+                findCombinations(newspapers, budget - price, result, current, index + 1);
+                current.remove(current.size() - 1);
+            }
+        }
+
+        // Try excluding the current newspaper and move to the next one
+        findCombinations(newspapers, budget, result, current, index + 1);
+    }
+}
